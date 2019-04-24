@@ -1,10 +1,14 @@
 ﻿using ismycommitmessageuseful.Database;
+using ismycommitmessageuseful.ML;
+using ismycommitmessageuseful.Models;
+using ismycommitmessageuseful.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 using System;
 
@@ -39,10 +43,19 @@ namespace ismycommitmessageuseful
                 options.UseNpgsql(connectionStringBuilder.ToString());
             });
 
+            services.AddScoped<IPooledPredictionEngine<CommitInput, CommitPrediction>>(ctx =>
+            {
+                return new PooledPredictionEngine<CommitInput, CommitPrediction>(null, -1);
+            });
+
+            services.AddMemoryCache();
+
+            services.AddSingleton<IHostedService, UpdateModelService>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {

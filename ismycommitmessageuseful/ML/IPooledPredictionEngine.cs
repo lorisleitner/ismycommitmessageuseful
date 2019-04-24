@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace ismycommitmessageuseful.ML
 {
     public interface IPooledPredictionEngine<TSample, TPrediction>
+        where TSample : class
+        where TPrediction : class, new()
     {
         ITransformer Model { get; }
 
