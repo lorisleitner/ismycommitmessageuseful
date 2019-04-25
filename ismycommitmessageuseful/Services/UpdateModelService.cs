@@ -1,9 +1,9 @@
 ﻿using ismycommitmessageuseful.Database;
+using ismycommitmessageuseful.ML;
 using ismycommitmessageuseful.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.ML;
 using Microsoft.ML.Transforms.Text;
 using System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ismycommitmessageuseful.Services
 {
-    public class UpdateModelService : BackgroundService
+    public class UpdateModelService : TimedBackgroundService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IMemoryCache _memoryCache;
@@ -24,6 +24,8 @@ namespace ismycommitmessageuseful.Services
             _serviceScopeFactory = serviceScopeFactory;
             _memoryCache = memoryCache;
         }
+
+        public override TimeSpan Interval => TimeSpan.FromHours(1);
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -47,6 +49,9 @@ namespace ismycommitmessageuseful.Services
             var trainingPipeline = dataPipeline.Append(mlContext.Regression.Trainers.FastTree());
 
             var model = trainingPipeline.Fit(trainingData);
+
+            var engine = new PooledPredictionEngine<CommitInput, CommitPrediction>(model, -1);
+            _memoryCache.Set<IPooledPredictionEngine<CommitInput, CommitPrediction>>(CacheKeys.PredictionEngine, engine);
         }
 
         private async Task<IEnumerable<CommitInput>> GetDataAsync()

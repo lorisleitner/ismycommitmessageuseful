@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using System;
+using System.Threading;
 
 namespace ismycommitmessageuseful
 {
@@ -45,14 +47,25 @@ namespace ismycommitmessageuseful
 
             services.AddScoped<IPooledPredictionEngine<CommitInput, CommitPrediction>>(ctx =>
             {
-                return new PooledPredictionEngine<CommitInput, CommitPrediction>(null, -1);
+                var memoryCache = ctx.GetRequiredService<IMemoryCache>();
+
+                IPooledPredictionEngine<CommitInput, CommitPrediction> engine;
+
+                do
+                {
+                    engine = memoryCache.Get<IPooledPredictionEngine<CommitInput, CommitPrediction>>(CacheKeys.PredictionEngine);
+                }
+                while (engine == null);
+
+                return engine;
             });
 
             services.AddMemoryCache();
 
             services.AddSingleton<IHostedService, UpdateModelService>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
