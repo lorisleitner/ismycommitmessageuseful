@@ -19,6 +19,11 @@ namespace ismycommitmessageuseful
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureLogging(loggingBuilder =>
+                {
+                    loggingBuilder.ClearProviders();
+                    loggingBuilder.AddConsole();
+                })
                 .UseStartup<Startup>();
     }
 }
