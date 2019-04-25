@@ -3,24 +3,32 @@ using ismycommitmessageuseful.ML;
 using ismycommitmessageuseful.Models;
 using ismycommitmessageuseful.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ismycommitmessageuseful
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly ILogger _logger;
+
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -76,11 +84,30 @@ namespace ismycommitmessageuseful
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
             else
             {
+                app.UseExceptionHandler(exceptionApp =>
+                {
+                    exceptionApp.Run(context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+                        var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                        if (contextFeature != null)
+                        {
+                            _logger.LogError(contextFeature.Error, "Unhandled exception occurred");
+                        }
+
+                        return Task.CompletedTask;
+                    });
+                });
+
                 app.UseHsts();
             }
+
+
 
             app.UseHttpsRedirection();
             app.UseMvc();
