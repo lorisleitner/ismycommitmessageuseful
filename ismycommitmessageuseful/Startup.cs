@@ -49,6 +49,9 @@ namespace ismycommitmessageuseful
             {
                 var memoryCache = ctx.GetRequiredService<IMemoryCache>();
 
+                // A prediction request can arrive before model generation was completed (model is generated on every startup)
+                // so we need to spin here and wait until the model is ready to predict
+
                 IPooledPredictionEngine<CommitInput, CommitPrediction> engine;
 
                 do

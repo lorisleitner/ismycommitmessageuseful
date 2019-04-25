@@ -22,6 +22,9 @@ namespace ismycommitmessageuseful
                 .ConfigureLogging(loggingBuilder =>
                 {
                     loggingBuilder.ClearProviders();
+
+                    // API will be hosted on Heroku
+                    // Heroku logs the console output, so we just need this
                     loggingBuilder.AddConsole();
                 })
                 .UseStartup<Startup>();
