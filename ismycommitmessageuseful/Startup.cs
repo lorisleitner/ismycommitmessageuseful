@@ -50,6 +50,11 @@ namespace ismycommitmessageuseful
 
                 connectionStringBuilder.Database = databaseUri.Segments[1];
 
+                connectionStringBuilder.ApplicationName = "ismycommitmessageuseful-api";
+
+                // Heroku only allows 20 concurrent connection, but 10 are enough for us
+                connectionStringBuilder.MaxPoolSize = 10;
+
                 options.UseNpgsql(connectionStringBuilder.ToString());
             });
 
