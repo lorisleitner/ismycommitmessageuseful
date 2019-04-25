@@ -3,6 +3,7 @@ using ismycommitmessageuseful.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,16 +16,20 @@ namespace ismycommitmessageuseful.Controllers
     {
         private readonly Context _context;
 
-        public RateController(Context context)
+        private readonly ILogger _logger;
+
+        public RateController(Context context, ILogger<RateController> logger)
         {
             _context = context;
+
+            _logger = logger;
         }
 
         [HttpGet("commits")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<CommitDto>>> Get()
         {
-            // I use raw SQL, because there is no suitable random function to use with LINQ
+            // We use raw SQL, because there is no suitable random function to use with LINQ
             return await _context
                 .Commits
                 .AsNoTracking()
@@ -61,10 +66,14 @@ namespace ismycommitmessageuseful.Controllers
 
                     await _context.SaveChangesAsync().ConfigureAwait(false);
 
+                    _logger.LogInformation("UsefulCount of commit {CommidId} was updated to {UsefulCount}", commit.Id, commit.UsefulCount);
+
                     break;
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
+                    _logger.LogError("Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
+
                     foreach (var entry in ex.Entries)
                         await entry.ReloadAsync().ConfigureAwait(false);
                 }
@@ -91,10 +100,14 @@ namespace ismycommitmessageuseful.Controllers
 
                     await _context.SaveChangesAsync().ConfigureAwait(false);
 
+                    _logger.LogInformation("NotUsefulCount of commit {CommidId} was updated to {NotUsefulCount}", commit.Id, commit.NotUsefulCount);
+
                     break;
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
+                    _logger.LogError("Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
+
                     foreach (var entry in ex.Entries)
                         await entry.ReloadAsync().ConfigureAwait(false);
                 }
@@ -121,10 +134,14 @@ namespace ismycommitmessageuseful.Controllers
 
                     await _context.SaveChangesAsync().ConfigureAwait(false);
 
+                    _logger.LogInformation("DontKnowCount of commit {CommidId} was updated to {DontKnowCount}", commit.Id, commit.DontKnowCount);
+
                     break;
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
+                    _logger.LogError("Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
+
                     foreach (var entry in ex.Entries)
                         await entry.ReloadAsync().ConfigureAwait(false);
                 }
