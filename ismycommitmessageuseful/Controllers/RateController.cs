@@ -72,7 +72,7 @@ namespace ismycommitmessageuseful.Controllers
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    _logger.LogError("Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
+                    _logger.LogError(ex, "Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
 
                     foreach (var entry in ex.Entries)
                         await entry.ReloadAsync().ConfigureAwait(false);
@@ -106,7 +106,7 @@ namespace ismycommitmessageuseful.Controllers
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    _logger.LogError("Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
+                    _logger.LogError(ex, "Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
 
                     foreach (var entry in ex.Entries)
                         await entry.ReloadAsync().ConfigureAwait(false);
@@ -140,7 +140,7 @@ namespace ismycommitmessageuseful.Controllers
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    _logger.LogError("Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
+                    _logger.LogError(ex, "Concurrent update of commit {CommitId} occurred. Retrying...", commit.Id);
 
                     foreach (var entry in ex.Entries)
                         await entry.ReloadAsync().ConfigureAwait(false);
