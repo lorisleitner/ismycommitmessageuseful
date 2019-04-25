@@ -42,5 +42,95 @@ namespace ismycommitmessageuseful.Controllers
                 .ToListAsync()
                 .ConfigureAwait(false);
         }
+
+        [HttpPost("commits/{id}/useful")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Useful(int id)
+        {
+            var commit = _context.Commits.SingleOrDefault(x => x.Id == id);
+            if (commit == null)
+                return NotFound();
+
+            while (true)
+            {
+                try
+                {
+                    ++commit.UsefulCount;
+
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                    break;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    foreach (var entry in ex.Entries)
+                        await entry.ReloadAsync().ConfigureAwait(false);
+                }
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("commits/{id}/notuseful")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> NotUseful(int id)
+        {
+            var commit = _context.Commits.SingleOrDefault(x => x.Id == id);
+            if (commit == null)
+                return NotFound();
+
+            while (true)
+            {
+                try
+                {
+                    ++commit.NotUsefulCount;
+
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                    break;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    foreach (var entry in ex.Entries)
+                        await entry.ReloadAsync().ConfigureAwait(false);
+                }
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("commits/{id}/dontknow")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DontKnow(int id)
+        {
+            var commit = _context.Commits.SingleOrDefault(x => x.Id == id);
+            if (commit == null)
+                return NotFound();
+
+            while (true)
+            {
+                try
+                {
+                    ++commit.DontKnowCount;
+
+                    await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                    break;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    foreach (var entry in ex.Entries)
+                        await entry.ReloadAsync().ConfigureAwait(false);
+                }
+            }
+
+            return Ok();
+        }
     }
 }
