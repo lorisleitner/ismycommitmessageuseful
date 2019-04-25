@@ -39,23 +39,21 @@ namespace ismycommitmessageuseful.ML
         }
 
         private readonly MLContext _mlContext;
-        private readonly ITransformer _model;
         private readonly ObjectPool<PredictionEngine<TSample, TPrediction>> _predictionEnginePool;
-        private int _maxObjectsRetained;
 
         public PooledPredictionEngine(Stream model, int maxObjectsRetained)
         {
             _mlContext = new MLContext();
             _mlContext.Model.Load(model, out _);
 
-            _maxObjectsRetained = maxObjectsRetained;
+            MaxObjectsRetained = maxObjectsRetained;
 
             _predictionEnginePool = CreatePredictionEnginePool();
         }
 
-        public ITransformer Model => _model;
+        public ITransformer Model { get; }
 
-        public int MaxObjectsRetained => _maxObjectsRetained;
+        public int MaxObjectsRetained { get; private set; }
 
         public TPrediction Predict(TSample sample)
         {
@@ -73,12 +71,12 @@ namespace ismycommitmessageuseful.ML
 
         private ObjectPool<PredictionEngine<TSample, TPrediction>> CreatePredictionEnginePool()
         {
-            var policy = new PooledPredictionEnginePolicy(_mlContext, _model);
+            var policy = new PooledPredictionEnginePolicy(_mlContext, Model);
 
-            if (_maxObjectsRetained < 1)
-                _maxObjectsRetained = Environment.ProcessorCount * 2;
+            if (MaxObjectsRetained < 1)
+                MaxObjectsRetained = Environment.ProcessorCount * 2;
 
-            return new DefaultObjectPool<PredictionEngine<TSample, TPrediction>>(policy, _maxObjectsRetained);
+            return new DefaultObjectPool<PredictionEngine<TSample, TPrediction>>(policy, MaxObjectsRetained);
         }
     }
 }
