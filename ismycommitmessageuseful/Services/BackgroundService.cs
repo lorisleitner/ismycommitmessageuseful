@@ -9,40 +9,46 @@ namespace ismycommitmessageuseful.Services
 {
     public abstract class BackgroundService : IHostedService, IDisposable
     {
-        private Task _task;
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected BackgroundService()
         {
-            _task = ExecuteAsync(_cts.Token);
+            Cts = new CancellationTokenSource();
+        }
 
-            if(_task.IsCompleted)
+        protected Task Task { get; set; }
+
+        protected CancellationTokenSource Cts { get; }
+
+        public virtual Task StartAsync(CancellationToken cancellationToken)
+        {
+            Task = ExecuteAsync(Cts.Token);
+
+            if(Task.IsCompleted)
             {
-                return _task;
+                return Task;
             }
 
             return Task.CompletedTask;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public virtual async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (_task == null)
+            if (Task == null)
                 return;
 
             try
             {
-                _cts.Cancel();
+                Cts.Cancel();
             }
             finally
             {
-                await Task.WhenAny(_task, Task.Delay(Timeout.Infinite, cancellationToken))
+                await Task.WhenAny(Task, Task.Delay(Timeout.Infinite, cancellationToken))
                     .ConfigureAwait(false);
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            _cts.Cancel();
+            Cts.Cancel();
         }
 
         protected abstract Task ExecuteAsync(CancellationToken cancellationToken);
