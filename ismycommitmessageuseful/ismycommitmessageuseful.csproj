@@ -9,6 +9,8 @@
     <Description>Rating commit message usefullness with machine learning</Description>
     <PackageLicenseExpression>MIT License</PackageLicenseExpression>
     <PackageTags>csharp, dotnet, machine learning, ml, ml.net, git, commit, asp.net, .net core</PackageTags>
+
+    <TieredCompilation>true</TieredCompilation>
   </PropertyGroup>
 
   <ItemGroup>
