@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.ObjectPool;
 using Microsoft.ML;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ismycommitmessageuseful.ML
 {
@@ -41,12 +38,25 @@ namespace ismycommitmessageuseful.ML
         private readonly MLContext _mlContext;
         private readonly ObjectPool<PredictionEngine<TSample, TPrediction>> _predictionEnginePool;
 
-        public PooledPredictionEngine(Stream model, int maxObjectsRetained)
+        private PooledPredictionEngine(int maxObjectsRetained)
         {
             _mlContext = new MLContext();
-            _mlContext.Model.Load(model, out _);
 
             MaxObjectsRetained = maxObjectsRetained;
+        }
+
+        public PooledPredictionEngine(Stream model, int maxObjectsRetained)
+            : this(maxObjectsRetained)
+        {
+            _mlContext.Model.Load(model, out _);
+
+            _predictionEnginePool = CreatePredictionEnginePool();
+        }
+
+        public PooledPredictionEngine(ITransformer model, int maxObjectsRetained)
+            : this(maxObjectsRetained)
+        {
+            Model = model;
 
             _predictionEnginePool = CreatePredictionEnginePool();
         }
