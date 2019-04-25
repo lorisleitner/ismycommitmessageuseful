@@ -107,8 +107,6 @@ namespace ismycommitmessageuseful
                 app.UseHsts();
             }
 
-
-
             app.UseHttpsRedirection();
             app.UseMvc();
         }
