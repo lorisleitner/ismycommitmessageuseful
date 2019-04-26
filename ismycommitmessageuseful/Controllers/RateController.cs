@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ismycommitmessageuseful.Controllers
 {
-    [Route("api")]
+    [Route("api/commits")]
     [ApiController]
     public class RateController : Controller
     {
@@ -25,7 +25,7 @@ namespace ismycommitmessageuseful.Controllers
             _logger = logger;
         }
 
-        [HttpGet("commits")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<CommitDto>>> Get()
         {
@@ -48,7 +48,7 @@ namespace ismycommitmessageuseful.Controllers
                 .ConfigureAwait(false);
         }
 
-        [HttpPost("commits/{id}/useful")]
+        [HttpPost("{id}/useful")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -82,7 +82,7 @@ namespace ismycommitmessageuseful.Controllers
             return Ok();
         }
 
-        [HttpPost("commits/{id}/notuseful")]
+        [HttpPost("{id}/notuseful")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -116,7 +116,7 @@ namespace ismycommitmessageuseful.Controllers
             return Ok();
         }
 
-        [HttpPost("commits/{id}/dontknow")]
+        [HttpPost("{id}/dontknow")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
