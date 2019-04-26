@@ -19,7 +19,7 @@ namespace ismycommitmessageuseful.Controllers
         [HttpGet("predict")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<CommitPredictionDto> Predict([FromBody]CommitInputDto commitInputDto)
+        public ActionResult<CommitPredictionDto> Predict([FromQuery]CommitInputDto commitInputDto)
         {
             var commitInput = new CommitInput()
             {
