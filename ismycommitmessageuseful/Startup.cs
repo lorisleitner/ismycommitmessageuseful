@@ -80,6 +80,8 @@ namespace ismycommitmessageuseful
 
             services.AddSingleton<IHostedService, UpdateModelService>();
 
+            services.AddCors();
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -113,6 +115,13 @@ namespace ismycommitmessageuseful
             }
 
             app.UseHttpsRedirection();
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+            });
             app.UseMvc();
         }
     }
