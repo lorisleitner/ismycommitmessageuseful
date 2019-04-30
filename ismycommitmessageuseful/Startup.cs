@@ -1,4 +1,5 @@
-﻿using ismycommitmessageuseful.Database;
+﻿using AspNetCoreRateLimit;
+using ismycommitmessageuseful.Database;
 using ismycommitmessageuseful.ML;
 using ismycommitmessageuseful.Models;
 using ismycommitmessageuseful.Services;
@@ -15,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -80,6 +82,57 @@ namespace ismycommitmessageuseful
 
             services.AddSingleton<IHostedService, UpdateModelService>();
 
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.EnableEndpointRateLimiting = true;
+                options.QuotaExceededResponse = new QuotaExceededResponse
+                {
+                    Content = "{{\"message\":\"API quota exceeded\",\"retry-after\":\"{2}\"}}",
+                    ContentType = "application/json",
+                    StatusCode = 429
+                };
+                options.GeneralRules = new List<RateLimitRule>
+                {
+                    new RateLimitRule
+                    {
+                        Endpoint = "*:/api/predict",
+                        Limit = 1,
+                        Period = "1s"
+                    },
+                    new RateLimitRule
+                    {
+                        Endpoint = "*:/api/commits/",
+                        Limit = 1,
+                        Period = "5s"
+                    },
+                    new RateLimitRule
+                    {
+                        Endpoint = "*:/api/commits/*/useful",
+                        Limit = 1,
+                        Period = "5s"
+                    },
+                    new RateLimitRule
+                    {
+                        Endpoint = "*:/api/commits/*/notuseful",
+                        Limit = 1,
+                        Period = "5s"
+                    },
+                    new RateLimitRule
+                    {
+                        Endpoint = "*:/api/commits/*/dontknow",
+                        Limit = 1,
+                        Period = "5s"
+                    },
+                };
+            });
+
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddCors();
 
             services.AddMvc()
@@ -112,6 +165,7 @@ namespace ismycommitmessageuseful
                 });
 
                 app.UseHsts();
+                app.UseIpRateLimiting();
             }
 
             app.UseHttpsRedirection();
