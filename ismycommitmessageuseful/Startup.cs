@@ -117,10 +117,10 @@ namespace ismycommitmessageuseful
             app.UseHttpsRedirection();
             app.UseCors(builder =>
             {
-                builder.AllowAnyOrigin()
+                builder
+                .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+                .AllowAnyHeader();
             });
             app.UseMvc();
         }
