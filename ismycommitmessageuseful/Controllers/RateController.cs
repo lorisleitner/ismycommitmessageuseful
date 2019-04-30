@@ -33,12 +33,16 @@ namespace ismycommitmessageuseful.Controllers
             return await _context
                 .Commits
                 .AsNoTracking()
-                .FromSql("SELECT * FROM " +
-                    "(SELECT \"Id\",\"Message\",\"UsefulCount\",\"NotUsefulCount\",\"DontKnowCount\",\"xmin\"" +
-                    "FROM \"Commits\"" +
-                    "ORDER BY \"UsefulCount\" + \"NotUsefulCount\"" +
-                    "LIMIT 50) AS \"x\"" +
-                    "ORDER BY random()")
+                .FromSql("SELECT" +
+                "\"Id\"" +
+                ",\"Message\"" +
+                ",\"UsefulCount\"" +
+                ",\"NotUsefulCount\"" +
+                ",\"DontKnowCount\"" +
+                ",\"xmin\"" +
+                "FROM\"Commits\"" +
+                "ORDER BY random()" +
+                "LIMIT 50")
                 .Select(x => new CommitDto
                 {
                     Id = x.Id,
