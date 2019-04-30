@@ -63,7 +63,12 @@ namespace ismycommitmessageuseful.Services
                         UseAllLengths = true,
                         Weighting = NgramExtractingEstimator.WeightingCriteria.Idf
                     },
-                    CharFeatureExtractor = null,
+                    CharFeatureExtractor = new WordBagEstimator.Options
+                    {
+                        NgramLength = 2,
+                        UseAllLengths = false,
+                        Weighting = NgramExtractingEstimator.WeightingCriteria.Idf
+                    },
                     KeepDiacritics = false,
                     KeepNumbers = true,
                     KeepPunctuations = true,
@@ -73,7 +78,7 @@ namespace ismycommitmessageuseful.Services
                 .Append(mlContext.Transforms.NormalizeLpNorm("Features", "Features"))
                 .AppendCacheCheckpoint(mlContext);
 
-            var trainingPipeline = dataPipeline.Append(mlContext.Regression.Trainers.FastForest(
+            var trainingPipeline = dataPipeline.Append(mlContext.Regression.Trainers.FastTree(
                 numberOfTrees: 100,
                 numberOfLeaves: 25,
                 minimumExampleCountPerLeaf: 20));
