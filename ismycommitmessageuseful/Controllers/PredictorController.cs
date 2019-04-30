@@ -2,6 +2,7 @@
 using ismycommitmessageuseful.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace ismycommitmessageuseful.Controllers
 {
@@ -30,7 +31,7 @@ namespace ismycommitmessageuseful.Controllers
 
             return Ok(new CommitPredictionDto()
             {
-                Usefulness = prediction.Usefulness
+                Usefulness = Math.Clamp(prediction.Usefulness, 0.0f, 100.0f)
             });
         }
     }
