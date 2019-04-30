@@ -59,7 +59,7 @@ namespace ismycommitmessageuseful.Services
                     CaseMode = TextNormalizingEstimator.CaseMode.Lower,
                     WordFeatureExtractor = new WordBagEstimator.Options
                     {
-                        NgramLength = 2,
+                        NgramLength = 3,
                         UseAllLengths = true,
                         Weighting = NgramExtractingEstimator.WeightingCriteria.Idf
                     },
