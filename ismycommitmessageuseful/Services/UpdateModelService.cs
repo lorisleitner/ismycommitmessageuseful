@@ -33,7 +33,7 @@ namespace ismycommitmessageuseful.Services
             _logger = logger;
         }
 
-        public override TimeSpan Interval => TimeSpan.FromHours(1);
+        public override TimeSpan Interval => TimeSpan.FromMinutes(5);
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
@@ -44,6 +44,12 @@ namespace ismycommitmessageuseful.Services
             var data = await GetDataAsync().ConfigureAwait(false);
 
             _logger.LogInformation("Loaded {CommitCount} commits from database", data.Count());
+
+            if(!data.Any())
+            {
+                _logger.LogError("Cancelling model generation because there is no training data available");
+                return;
+            }
 
             var trainingData = mlContext.Data.LoadFromEnumerable(data);
 
