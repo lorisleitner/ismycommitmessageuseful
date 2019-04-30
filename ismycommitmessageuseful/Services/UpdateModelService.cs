@@ -23,7 +23,7 @@ namespace ismycommitmessageuseful.Services
 
         private readonly ILogger _logger;
 
-        public UpdateModelService(IServiceScopeFactory serviceScopeFactory, 
+        public UpdateModelService(IServiceScopeFactory serviceScopeFactory,
             IMemoryCache memoryCache,
             ILogger<UpdateModelService> logger)
         {
@@ -45,7 +45,7 @@ namespace ismycommitmessageuseful.Services
 
             _logger.LogInformation("Loaded {CommitCount} commits from database", data.Count());
 
-            if(!data.Any())
+            if (!data.Any())
             {
                 _logger.LogError("Cancelling model generation because there is no training data available");
                 return;
@@ -57,14 +57,26 @@ namespace ismycommitmessageuseful.Services
                 .Append(mlContext.Transforms.Text.FeaturizeText("MessageFeatures", new TextFeaturizingEstimator.Options
                 {
                     CaseMode = TextNormalizingEstimator.CaseMode.Lower,
-                    WordFeatureExtractor = new WordBagEstimator.Options { NgramLength = 2, UseAllLengths = true },
-                    CharFeatureExtractor = new WordBagEstimator.Options { NgramLength = 3, UseAllLengths = false }
+                    WordFeatureExtractor = new WordBagEstimator.Options
+                    {
+                        NgramLength = 2,
+                        UseAllLengths = true,
+                        Weighting = NgramExtractingEstimator.WeightingCriteria.Idf
+                    },
+                    CharFeatureExtractor = null,
+                    KeepDiacritics = false,
+                    KeepNumbers = true,
+                    KeepPunctuations = true,
+                    StopWordsRemoverOptions = null
                 }, "Message"))
                 .Append(mlContext.Transforms.CopyColumns("Features", "MessageFeatures"))
                 .Append(mlContext.Transforms.NormalizeLpNorm("Features", "Features"))
                 .AppendCacheCheckpoint(mlContext);
 
-            var trainingPipeline = dataPipeline.Append(mlContext.Regression.Trainers.FastTree());
+            var trainingPipeline = dataPipeline.Append(mlContext.Regression.Trainers.FastForest(
+                numberOfTrees: 100,
+                numberOfLeaves: 25,
+                minimumExampleCountPerLeaf: 20));
 
             var stopwatch = Stopwatch.StartNew();
 
