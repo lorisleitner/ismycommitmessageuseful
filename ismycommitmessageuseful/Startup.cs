@@ -3,6 +3,7 @@ using ismycommitmessageuseful.Configuration;
 using ismycommitmessageuseful.Database;
 using ismycommitmessageuseful.ML;
 using ismycommitmessageuseful.Models;
+using ismycommitmessageuseful.RateLimiting;
 using ismycommitmessageuseful.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -88,9 +89,9 @@ namespace ismycommitmessageuseful
                 options.QuotaExceededResponse = new QuotaExceededResponse
                 {
                     Content = "{{\"message\":\"API quota exceeded\",\"retryAfter\":\"{2}\"}}",
-                    ContentType = "application/json",
-                    StatusCode = 429
+                    ContentType = "application/json"
                 };
+
                 options.GeneralRules = new List<RateLimitRule>
                 {
                     new RateLimitRule
@@ -165,7 +166,7 @@ namespace ismycommitmessageuseful
                 });
 
                 app.UseHsts();
-                app.UseIpRateLimiting();
+                app.UseMiddleware<CorsIpRateLimitMiddleware>(Array.Empty<object>());
             }
             
             app.UseHttpsRedirection();
