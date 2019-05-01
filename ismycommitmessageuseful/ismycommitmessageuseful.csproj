@@ -11,6 +11,10 @@
     <PackageTags>csharp, dotnet, machine learning, ml, ml.net, git, commit, asp.net, .net core</PackageTags>
 
     <TieredCompilation>true</TieredCompilation>
+
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
