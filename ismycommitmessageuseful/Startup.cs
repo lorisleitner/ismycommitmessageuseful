@@ -1,4 +1,5 @@
 ﻿using AspNetCoreRateLimit;
+using ismycommitmessageuseful.Configuration;
 using ismycommitmessageuseful.Database;
 using ismycommitmessageuseful.ML;
 using ismycommitmessageuseful.Models;
@@ -17,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ismycommitmessageuseful
@@ -87,7 +87,7 @@ namespace ismycommitmessageuseful
                 options.EnableEndpointRateLimiting = true;
                 options.QuotaExceededResponse = new QuotaExceededResponse
                 {
-                    Content = "{{\"message\":\"API quota exceeded\",\"retry-after\":\"{2}\"}}",
+                    Content = "{{\"message\":\"API quota exceeded\",\"retryAfter\":\"{2}\"}}",
                     ContentType = "application/json",
                     StatusCode = 429
                 };
@@ -126,7 +126,7 @@ namespace ismycommitmessageuseful
                 };
             });
 
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton<IRateLimitConfiguration, EndpointRateLimiterConfiguration>();
 
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
@@ -167,7 +167,7 @@ namespace ismycommitmessageuseful
                 app.UseHsts();
                 app.UseIpRateLimiting();
             }
-
+            
             app.UseHttpsRedirection();
             app.UseCors(builder =>
             {
