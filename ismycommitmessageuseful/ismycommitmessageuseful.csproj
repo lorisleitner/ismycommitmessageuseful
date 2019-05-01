@@ -11,9 +11,14 @@
     <PackageTags>csharp, dotnet, machine learning, ml, ml.net, git, commit, asp.net, .net core</PackageTags>
 
     <TieredCompilation>true</TieredCompilation>
+
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCoreRateLimit" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
