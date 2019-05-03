@@ -34,13 +34,13 @@ namespace ismycommitmessageuseful.Controllers
                 .Commits
                 .AsNoTracking()
                 .FromSql("SELECT" +
-                "\"Id\"" +
-                ",\"Message\"" +
-                ",\"UsefulCount\"" +
-                ",\"NotUsefulCount\"" +
-                ",\"DontKnowCount\"" +
+                "\"id\"" +
+                ",\"message\"" +
+                ",\"useful_count\"" +
+                ",\"not_useful_count\"" +
+                ",\"dont_know_count\"" +
                 ",\"xmin\"" +
-                "FROM\"Commits\"" +
+                "FROM\"commit\"" +
                 "ORDER BY random()" +
                 "LIMIT 50")
                 .Select(x => new CommitDto
