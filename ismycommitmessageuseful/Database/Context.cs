@@ -17,8 +17,16 @@ namespace ismycommitmessageuseful.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Commit>()
-                .ForNpgsqlUseXminAsConcurrencyToken();
+            modelBuilder.Entity<Commit>(builder =>
+            {
+                builder
+                    .HasKey(c => c.Id)
+                    .HasName("commit_id_pkey");
+
+                builder
+                    .ForNpgsqlUseXminAsConcurrencyToken();
+            });
+                
         }
     }
 }
